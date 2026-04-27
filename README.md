@@ -4,8 +4,8 @@ Machine learning pipeline that predicts two supply chain outcomes from the [Data
 
 | Task | Type | Target column | Best model |
 |------|------|--------------|------------|
-| Shipment Duration | Regression | `Days for shipping (real)` | Random Forest (R² = 0.83) |
-| Late Delivery Risk | Classification | `Late_delivery_risk` | XGBoost (F1 = 0.727) |
+| Shipment Duration | Regression | `Days for shipping (real)` | Random Forest (R² = 0.831) |
+| Late Delivery Risk | Classification | `Late_delivery_risk` | XGBoost (F1 = 0.732) |
 
 Models compared: **Random Forest**, **XGBoost**, **Gradient Boosting**, **LightGBM**
 
