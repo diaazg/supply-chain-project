@@ -1,6 +1,6 @@
 # Supply Chain Prediction
 
-Machine learning pipeline that predicts two supply chain outcomes from the [DataCo Smart Supply Chain dataset](https://www.kaggle.com/datasets/shashwatwork/dataco-smart-supply-chain-for-big-data-analysis):
+Machine learning pipeline that predicts two supply chain outcomes from the [DataCo Smart Supply Chain dataset](https://www.kaggle.com/datasets/shashwatwork/dataco-smart-supply-chain-for-big-data-analysis), served through a modern **Next.js + FastAPI** web application.
 
 | Task | Type | Target column | Best model |
 |------|------|--------------|------------|
@@ -31,14 +31,22 @@ supply chain project/
 │   ├── shipping/                   # Trained regression models (.pkl)
 │   ├── late/                       # Trained classification models (.pkl)
 │   └── metadata.pkl                # Label encoders, metrics, feature lists
-├── dashboard/
-│   └── app.py                      # Streamlit prediction dashboard
+├── backend/
+│   └── main.py                     # FastAPI server — loads models, exposes /meta and /predict
+├── frontend/
+│   ├── app/                        # Next.js App Router pages and global CSS
+│   ├── components/                 # React components (charts, cards, tables)
+│   ├── lib/
+│   │   └── api.ts                  # Typed fetch wrappers for the FastAPI backend
+│   └── package.json
 └── requirements.txt
 ```
 
 ---
 
 ## Setup
+
+### Python environment
 
 ```bash
 # 1. Clone the repo
@@ -49,12 +57,19 @@ cd "supply chain project"
 python -m venv .venv
 source .venv/bin/activate      # Windows: .venv\Scripts\activate
 
-# 3. Install dependencies
+# 3. Install Python dependencies
 pip install -r requirements.txt
 
 # 4. Place the raw dataset
 #    Download DataCoSupplyChainDataset.csv and put it at:
 #    data/raw/DataCoSupplyChainDataset.csv
+```
+
+### Frontend dependencies
+
+```bash
+cd frontend
+npm install
 ```
 
 ---
@@ -78,27 +93,65 @@ notebooks/training.ipynb            # full evaluation results
 python src/train_models.py
 ```
 
-This trains all 4 models per task, evaluates them on the test set, and saves everything to `models/`.
+Trains all 4 models per task, evaluates on the test set, and saves everything to `models/`.
 
-### Step 3 — Launch the dashboard
+### Step 3 — Start the app
 
+Open **two terminals** from the project root:
+
+**Terminal 1 — FastAPI backend**
 ```bash
-streamlit run dashboard/app.py
+uvicorn backend.main:app --reload --port 8000
 ```
+
+**Terminal 2 — Next.js frontend**
+```bash
+cd frontend && npm run dev
+```
+
+Then open **http://localhost:3000**.
 
 ---
 
-## Dashboard
+## Web Application
 
-The dashboard lets users:
+The UI is a full-stack web app built with **Next.js 16** (frontend) and **FastAPI** (backend).
+
+### Frontend stack
+
+| Library | Purpose |
+|---------|---------|
+| Next.js 16 + React 19 | App framework, App Router |
+| Tailwind CSS | Utility-first styling |
+| Framer Motion | Page and element animations |
+| Recharts | Interactive feature importance bar chart |
+| Lucide React | Icons |
+
+### Backend
+
+| Library | Purpose |
+|---------|---------|
+| FastAPI | REST API serving predictions |
+| Uvicorn | ASGI server |
+| scikit-learn / XGBoost / LightGBM | Model inference |
+| joblib | Model + metadata loading |
+
+### API endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/meta` | Returns dropdown options, feature lists, model names, and test-set metrics |
+| `POST` | `/predict` | Accepts `{ task, inputs }`, returns prediction, feature importances, and all-model comparison |
+
+### Features
 
 1. **Choose a task** — Shipment Duration or Late Delivery Risk
-2. **Enter order details** — dropdowns and inputs based on the model's feature set
-3. **Get a prediction** — result from the best model with a feature importance chart
-4. **Compare models** — see how all 4 models answer the same inputs
-5. **Track history** — all predictions in the session accumulated in a table
-
-The sidebar shows test-set metrics for every model so users know what "best model" means before they predict.
+2. **Enter order details** — dropdowns and numeric inputs populated from real training data options
+3. **Get a prediction** — animated result card (days remaining or on-time/late with confidence bar)
+4. **Feature importance chart** — interactive horizontal bar chart showing top 10 model drivers
+5. **Compare all models** — collapsible table with every model's answer on the same inputs
+6. **Prediction history** — session log of all predictions with task, result, model, and timestamp
+7. **Model metrics sidebar** — live test-set metrics table (R², MAE, RMSE for regression; F1, AUC, Accuracy for classification) with best model highlighted
 
 ---
 
