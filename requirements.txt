@@ -7,10 +7,10 @@ scikit-learn>=1.4
 xgboost>=2.0
 lightgbm>=4.3
 
-# Dashboard
-streamlit>=1.35
-matplotlib>=3.8
-seaborn>=0.13
+# API backend
+fastapi>=0.136
+uvicorn>=0.46
+python-multipart>=0.0.27
 
 # Utilities
 joblib>=1.3
