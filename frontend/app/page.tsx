@@ -147,8 +147,8 @@ export default function Home() {
   const bestR2 = Object.keys(metricsShip).length
     ? Math.max(...Object.values(metricsShip).map((m) => (m as Record<string, number>)["R²"] ?? 0)).toFixed(3)
     : "—";
-  const bestF1 = Object.keys(metricsLate).length
-    ? Math.max(...Object.values(metricsLate).map((m) => (m as Record<string, number>)["F1"] ?? 0)).toFixed(3)
+  const bestAUC = Object.keys(metricsLate).length
+    ? Math.max(...Object.values(metricsLate).map((m) => (m as Record<string, number>)["AUC"] ?? 0)).toFixed(3)
     : "—";
 
   return (
@@ -202,7 +202,7 @@ export default function Home() {
               <MetricsTable data={metricsShip} highlightCol="R²" higherBetter />
             )}
             {sidebarTab === "late" && Object.keys(metricsLate).length > 0 && (
-              <MetricsTable data={metricsLate} highlightCol="F1" higherBetter />
+              <MetricsTable data={metricsLate} highlightCol="AUC" higherBetter />
             )}
           </div>
 
@@ -237,7 +237,7 @@ export default function Home() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <KpiCard label="Models" value="4" Icon={Cpu} delay={0.1} color="#6366f1" />
               <KpiCard label="Best R²" value={bestR2} Icon={BarChart3} delay={0.15} color="#8b5cf6" />
-              <KpiCard label="Best F1" value={bestF1} Icon={BarChart3} delay={0.2} color="#06b6d4" />
+              <KpiCard label="Best AUC" value={bestAUC} Icon={BarChart3} delay={0.2} color="#06b6d4" />
               <KpiCard label="Predictions" value={String(history.length)} Icon={Sparkles} delay={0.25} color="#10b981" />
             </div>
 
