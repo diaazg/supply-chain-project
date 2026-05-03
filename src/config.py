@@ -30,7 +30,7 @@ TARGET_LATE     = "Late_delivery_risk"
 
 # ── Best models (from training.ipynb evaluation) ───────────────────────────────
 BEST_MODEL_SHIPPING = "Random Forest"   # R² = 0.831
-BEST_MODEL_LATE     = "XGBoost"         # F1 = 0.732
+BEST_MODEL_LATE     = "Random Forest"   # selected on AUC
 
 # ── Features ──────────────────────────────────────────────────────────────────
 DATE_FEATURES = [

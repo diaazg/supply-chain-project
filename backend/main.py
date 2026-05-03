@@ -83,6 +83,7 @@ def get_meta():
     }
 
 
+
 @app.post("/predict")
 def predict(req: PredictRequest):
     task    = req.task
@@ -103,13 +104,19 @@ def predict(req: PredictRequest):
         pred = float(model.predict(X)[0])
         result = {"type": "regression", "value": round(pred, 2), "label": f"{pred:.1f} days"}
     else:
-        pred_class = int(model.predict(X)[0])
-        pred_proba = float(model.predict_proba(X)[0][pred_class])
+        # Use tuned threshold 0.40 for classification
+        # class 1 is "Late Delivery"
+        prob_late = float(model.predict_proba(X)[0][1])
+        pred_class = 1 if prob_late >= 0.40 else 0
+        
+        # Confidence reflects the probability of the predicted class
+        conf = prob_late if pred_class == 1 else (1 - prob_late)
+        
         result = {
             "type":       "classification",
             "class":      pred_class,
             "label":      "Late Delivery" if pred_class == 1 else "On Time",
-            "confidence": round(pred_proba, 4),
+            "confidence": round(conf, 4),
         }
 
     # all-model comparison
@@ -120,10 +127,18 @@ def predict(req: PredictRequest):
             p = float(m.predict(X)[0])
             comparison.append({"model": name, "value": round(p, 2), "label": f"{p:.1f} days", "best": name == best})
         else:
-            pc = int(m.predict(X)[0])
-            pp = float(m.predict_proba(X)[0][pc])
-            comparison.append({"model": name, "class": pc, "label": "Late" if pc == 1 else "On Time",
-                                "confidence": round(pp, 4), "best": name == best})
+            # Apply same threshold logic to comparison models
+            p_late = float(m.predict_proba(X)[0][1])
+            pc = 1 if p_late >= 0.40 else 0
+            pp = p_late if pc == 1 else (1 - p_late)
+            
+            comparison.append({
+                "model": name, 
+                "class": pc, 
+                "label": "Late" if pc == 1 else "On Time",
+                "confidence": round(pp, 4), 
+                "best": name == best
+            })
 
     return {
         "result":       result,

@@ -39,7 +39,7 @@ export interface PredictResponse {
 }
 
 export async function fetchMeta(): Promise<Meta> {
-  const res = await fetch(`${BASE}/meta`);
+  const res = await fetch(`${BASE}/meta`, { cache: "no-store" });
   if (!res.ok) throw new Error("Failed to load metadata");
   return res.json();
 }
